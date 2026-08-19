@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+main {
+  margin: 0;
+}
+
+.full-frame-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #ffffff;
+}
+
+.full-frame-section:nth-child(odd) {
+  background: #111827;
+}
+
+.full-frame-section:nth-child(even) {
+  background: #2563eb;
+}
