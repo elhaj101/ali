@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+@import 'tailwindcss';
+
+/* ── Design tokens ────────────────────────────────────────────────────────
+   Dark, single-accent register. The accent is amber — warm and lamp-lit,
+   chosen against the cooler/more corporate teal because the through-line of
+   this portfolio is a human journey across five countries, not a SaaS pitch.
+   Amber is spent only on links, CTAs, active states, and the five places. */
+@theme {
+  --color-ink: #0b0c0e; /* page ground, near-black */
+  --color-raised: #141619; /* cards and raised surfaces */
+  --color-hairline: #24272c; /* borders, dividers */
+  --color-bone: #e8e6e1; /* primary text, warm off-white */
+  --color-mute: #8a8f98; /* secondary text */
+  --color-amber: #f0a02a; /* the single accent */
+  --color-amber-dim: #8a5c17; /* accent at rest, for inert strokes */
+
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--color-ink);
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Scroll snap: mandatory only where a full section reliably fits. Below the
+   mobile breakpoint — and on short landscape viewports — snapping is dropped
+   entirely so taller-than-viewport content (the map, the carousel) can never
+   become unreachable. */
+@media (min-width: 768px) and (min-height: 640px) {
+  html {
+    scroll-snap-type: y mandatory;
+  }
+
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+}
+
+/* The route line behind the waypoint nav is drawn once and lit progressively. */
+.route-rail {
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-hairline) 12%,
+    var(--color-hairline) 88%,
+    transparent
+  );
+}
+
+/* ── Motion ──────────────────────────────────────────────────────────────
+   The marquee track holds two identical copies of the card list side by side
+   and travels exactly one copy's width, so the wrap point is invisible. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Declared in the components layer on purpose. Unlayered rules outrank every
+   `@layer` in the cascade, so a plain `.animate-marquee` would let the
+   `animation` shorthand reset play-state to `running` and silently defeat the
+   `group-hover:[animation-play-state:paused]` utility. */
+@layer components {
+  .animate-marquee {
+    animation: marquee 44s linear infinite;
+    will-change: transform;
+  }
+}
+
+/* Slow breathing halo on each map waypoint. */
+@keyframes map-pulse {
+  0%,
+  100% {
+    transform: scale(0.75);
+    opacity: 0.28;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.06;
+  }
+}
+
+.map-pulse {
+  animation: map-pulse 3.4s ease-in-out infinite;
+  /* `transform-box` defaults to `view-box` on SVG elements, which would scale
+     each halo around the centre of the whole map instead of its own waypoint
+     and fling it across the ocean. `fill-box` pins it to its own geometry. */
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+::selection {
+  background: var(--color-amber);
+  color: var(--color-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
