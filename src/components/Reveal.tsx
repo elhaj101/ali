@@ -47,17 +47,20 @@ export function Section({
   id,
   children,
   className = '',
+  padY = 'py-24',
 }: {
   id: string
   children: ReactNode
   className?: string
+  /** Vertical padding. The map section runs tighter to buy the map height. */
+  padY?: string
 }) {
   return (
     <section
       id={id}
       // `md:pr-16` keeps the content column clear of the waypoint nav, which
       // appears at `md` but only gets generous page padding at `lg`.
-      className={`snap-section relative flex min-h-screen w-full flex-col justify-center px-6 py-24 sm:px-10 md:pr-16 lg:px-20 ${className}`}
+      className={`snap-section relative flex min-h-screen w-full flex-col justify-center px-6 ${padY} sm:px-10 md:pr-16 lg:px-20 ${className}`}
     >
       {children}
     </section>

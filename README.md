@@ -56,6 +56,25 @@ Lebanon only a few, so their outlines can't be hovered or tabbed to; the markers
 give all five places an identical, reliably sized hit area. Below the `sm`
 breakpoint the map is illustrative and the legend beneath it carries the full text.
 
+**The map shows the Eastern Hemisphere only.** The `MAP` config at the top of
+`WorldMap.tsx` holds the whole viewport definition. Two parts of it are
+load-bearing and easy to break:
+
+- **`rotate`.** Russia's Chukotka crosses the antimeridian into negative
+  longitudes, so dropping the Americas on its own leaves a feature near -169°
+  and the map's bounds stay a full 360° wide — no space is reclaimed at all.
+  Rotating to centre on 80°E moves the seam into the empty Pacific; only then
+  does the crop buy anything.
+- **`scale` / `center`.** These are the exact d3 `fitExtent` result for the
+  filtered country set, converted to a `center` because react-simple-maps pins
+  `translate` to the viewBox centre and ignores it in `projectionConfig`. If you
+  change `westLimit` or the filter, recompute them rather than nudging by eye.
+
+The section caps its own width to `(100vh - 341px) × 1.658` at `md` and up, where
+341px is the measured non-map chrome and 1.658 the map's aspect ratio. That keeps
+the legend above the fold — the section is a snap target, so anything past the
+fold would be unreachable.
+
 ## After the first deploy
 
 `index.html` ships a link-preview card (`public/og-image.png`, 1200×630) for when
