@@ -15,6 +15,14 @@
   --color-amber: #f0a02a; /* the single accent */
   --color-amber-dim: #8a5c17; /* accent at rest, for inert strokes */
 
+  /* The map's hover card is the one light surface on the page. It needs its
+     own ramp — the dark palette's text colours have no contrast on white. */
+  --color-card: #f4f2ee; /* warm off-white card ground */
+  --color-card-ink: #14161a; /* card headings */
+  --color-card-mute: #565c65; /* card body copy */
+  --color-card-line: #d8d4cc; /* card rules */
+  --color-amber-deep: #b35c06; /* accent darkened to read on the card */
+
   --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;

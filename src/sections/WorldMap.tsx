@@ -9,38 +9,32 @@ import { PLACES, PLACE_BY_ID, formatCoords, type Place } from '../data/places'
 const GEO_URL = `${import.meta.env.BASE_URL}countries-50m.json`
 
 /* ── Map viewport ─────────────────────────────────────────────────────────
-   The map shows the Eastern Hemisphere only. The Americas carry no part of
-   this story, and dropping them lets everything that remains render ~1.3×
-   larger in the same amount of vertical space.
+   A cropped window on Europe–Africa–Asia rather than the whole globe: the
+   frame is lon -10..145, lat 5..58, which holds all five places with room to
+   spare and cuts the empty ocean that was making the map tall. Aspect 2.42
+   means it spreads to full width instead of growing downward, and everything
+   in it renders ~1.9x larger than the world view did.
 
-   Two things make that work, and both are load-bearing:
+   Countries simply clip at the frame edge — that's the point of a window, not
+   a bug. `rotate` still centres on 80°E so Russia's Chukotka can't drag the
+   bounds across the antimeridian.
 
-   1. ROTATE. Russia's Chukotka crosses the antimeridian into negative
-      longitudes, so simply filtering out the Americas still leaves a feature
-      near -169° and the map's bounds stay a full 360° wide — zero size gained.
-      Rotating the projection to centre on 80°E moves the seam into the empty
-      Pacific, and only then does the crop actually buy anything.
-
-   2. FILTER. Anything whose centroid sits west of -25° is dropped, which is
-      exactly the Americas, the Caribbean and Greenland; Iceland (-18.6°) and
-      Cabo Verde (-24.0°) are the closest calls and both stay. Antarctica goes
-      too — it spans a third of the map's height and says nothing here.
-
-   The viewBox and scale below are the exact d3 `fitExtent` result for that set
-   of countries, so the map meets all four edges with no dead margin. If you
-   change the filter, recompute them rather than nudging by eye. */
+   scale/center are the exact fit for that window, expressed as a `center`
+   because react-simple-maps pins `translate` to the viewBox centre and ignores
+   it in projectionConfig. Recompute rather than nudge if the window changes. */
 const MAP = {
-  width: 980,
-  height: 591,
+  width: 1000,
+  height: 412,
+  aspect: 2.424,
   rotate: [-80, 0, 0] as [number, number, number],
-  scale: 255.62,
-  /* Solved so the fitted map centres inside the viewBox: react-simple-maps
-     pins `translate` to the viewBox centre and only honours center/rotate/
-     scale/parallels, so the fit is expressed as a `center` instead. */
-  center: [-19.3847, 7.012] as [number, number],
-  /** Westmost centroid longitude to keep. */
+  scale: 429.84,
+  center: [-13.3033, 29.3979] as [number, number],
+  /** Westmost centroid longitude to keep (drops the Americas from the DOM). */
   westLimit: -25,
 }
+
+/** Waypoint colour. One place to change; the halo follows it. */
+const WAYPOINT = '#ff7a00'
 
 const CARD_W = 310
 const GAP = 14
@@ -106,9 +100,9 @@ export function WorldMap() {
           otherwise the legend below the map lands past the fold where a
           mandatory snap point makes it unreachable. 341px is the measured
           non-map chrome (heading + legend + caption + this section's padding)
-          and 1.658 is the map's aspect ratio; below `md` snapping is off and
+          and 2.424 is the map's aspect ratio; below `md` snapping is off and
           the section is free to grow instead. */}
-      <div className="mx-auto w-full max-w-6xl md:max-w-[min(72rem,calc((100vh_-_341px)*1.658))]">
+      <div className="mx-auto w-full max-w-6xl md:max-w-[min(80rem,calc((100vh_-_341px)*2.424))]">
         <Reveal>
           <div className="flex items-center gap-3">
             <span className="h-px w-8 bg-amber" aria-hidden="true" />
@@ -196,14 +190,14 @@ export function WorldMap() {
                       <circle r={13} fill="transparent" />
                       <circle
                         r={9}
-                        fill="#f0a02a"
-                        opacity={0.18}
+                        fill={WAYPOINT}
+                        opacity={0.22}
                         className="map-pulse"
                         style={{ animationDelay: `${i * 0.45}s` }}
                       />
                       <circle
                         r={isActive ? 6 : 4.2}
-                        fill="#f0a02a"
+                        fill={WAYPOINT}
                         stroke="#0b0c0e"
                         strokeWidth={1.4}
                         style={{ transition: 'r 250ms ease' }}
@@ -254,7 +248,7 @@ export function WorldMap() {
             // country, years and blurb on focus, so a live region here would
             // read the same text a second time.
             aria-hidden="true"
-            className="pointer-events-none fixed z-40 rounded-lg border border-hairline bg-raised/95 p-4 shadow-2xl shadow-black/60 backdrop-blur-sm"
+            className="pointer-events-none fixed z-40 rounded-lg border border-card-line bg-card p-4 shadow-2xl shadow-black/50"
             style={{
               width: CARD_W,
               top: pos?.top ?? -9999,
@@ -262,15 +256,15 @@ export function WorldMap() {
             }}
           >
             <div className="flex items-baseline justify-between gap-3">
-              <span className="font-display text-base font-semibold text-bone">
+              <span className="font-display text-base font-semibold text-card-ink">
                 {anchor.place.country}
               </span>
-              <span className="font-mono text-[0.68rem] tracking-wider text-amber">
+              <span className="font-mono text-[0.68rem] tracking-wider text-amber-deep">
                 {anchor.place.years}
               </span>
             </div>
-            <p className="mt-2 text-[0.82rem] leading-relaxed text-mute">{anchor.place.blurb}</p>
-            <p className="mt-3 border-t border-hairline pt-2 font-mono text-[0.62rem] tracking-wider text-mute/60">
+            <p className="mt-2 text-[0.82rem] leading-relaxed text-card-mute">{anchor.place.blurb}</p>
+            <p className="mt-3 border-t border-card-line pt-2 font-mono text-[0.62rem] tracking-wider text-card-mute/70">
               {formatCoords(anchor.place.coords)}
             </p>
           </motion.div>
