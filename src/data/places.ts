@@ -24,9 +24,10 @@ export const PLACES: Place[] = [
   {
     id: '422',
     country: 'Lebanon',
-    years: 'Roots',
+    years: 'Roots · present',
     coords: [35.88, 33.92],
-    blurb: 'Family roots — where my story began.',
+    blurb:
+      'Family roots — where my story began, and where I still take part in business projects today, mainly trading with Europe and further afield.',
   },
   {
     id: '414',
@@ -50,7 +51,7 @@ export const PLACES: Place[] = [
     years: '2022–2024',
     coords: [114.11, 22.4],
     blurb:
-      'Continued teaching while quietly planning my next chapter: a full career switch into tech.',
+      'Founded and ran my own recruitment agency, NihaoESL, alongside teaching — while quietly planning my next chapter: a full career switch into tech.',
   },
   {
     id: '276',

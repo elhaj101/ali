@@ -5,6 +5,7 @@ import { Hero } from './sections/Hero'
 import { WorldMap } from './sections/WorldMap'
 import { Services } from './sections/Services'
 import { Work } from './sections/Work'
+import { Venture } from './sections/Venture'
 import { Contact } from './sections/Contact'
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
         <WorldMap />
         <Services />
         <Work />
+        <Venture />
         <Contact />
       </main>
     </>
