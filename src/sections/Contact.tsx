@@ -1,5 +1,6 @@
 import { Reveal, Section, Eyebrow } from '../components/Reveal'
 import { LINKS, SocialRow } from '../components/Social'
+import { Impressum } from '../components/Impressum'
 
 export function Contact() {
   return (
@@ -37,10 +38,13 @@ export function Contact() {
       </div>
 
       <Reveal delay={0.24}>
-        <footer className="mx-auto mt-20 w-full max-w-5xl border-t border-hairline pt-6">
+        <footer className="mx-auto mt-20 flex w-full max-w-5xl flex-wrap items-center gap-x-6 gap-y-3 border-t border-hairline pt-6">
           <p className="font-mono text-[0.68rem] tracking-wider text-mute/70">
             © {new Date().getFullYear()} Ali El Haj — Berlin, Germany
           </p>
+          {/* Must stay reachable from every page view — §5 DDG requires the
+              Impressum to be "leicht erkennbar und unmittelbar erreichbar". */}
+          <Impressum />
         </footer>
       </Reveal>
     </Section>

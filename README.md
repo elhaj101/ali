@@ -75,6 +75,25 @@ The section caps its own width to `(100vh - 341px) × 1.658` at `md` and up, whe
 the legend above the fold — the section is a snap target, so anything past the
 fold would be unreachable.
 
+## ⚠️ Open item — Impressum address
+
+`src/components/Impressum.tsx` has `POSTAL_ADDRESS = null`. A German Impressum is
+only compliant with a real **ladungsfähige Anschrift** (§ 5 DDG) — name and email
+alone do not satisfy it, and an *incomplete* Impressum is as abmahnfähig as a
+missing one. Until the c/o business address is set, the dialog says so plainly
+rather than printing a placeholder.
+
+Set the constant, push, done:
+
+```ts
+const POSTAL_ADDRESS = ['c/o Some Service GmbH', 'Musterstraße 12', '10115 Berlin']
+```
+
+Related, and worth doing: the page loads **Google Fonts from Google's servers**,
+which transmits visitor IPs to Google — a documented Abmahnung vector in Germany
+(LG München I, 2022). The Impressum discloses it, but self-hosting the two font
+families removes the exposure entirely.
+
 ## After the first deploy
 
 `index.html` ships a link-preview card (`public/og-image.png`, 1200×630) for when
