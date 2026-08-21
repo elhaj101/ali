@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { Reveal, Section, Eyebrow } from '../components/Reveal'
 import { PROJECTS, type Project } from '../data/projects'
@@ -30,8 +31,25 @@ function Card({ project }: { project: Project }) {
   )
 }
 
+/** Marquee speeds, in seconds for one full pass. */
+const CRUISE = 44
+const FAST = 9
+
 export function Work() {
   const reduced = useReducedMotion()
+  const [paused, setPaused] = useState(false)
+  const [fast, setFast] = useState(false)
+
+  // Pause is React state rather than a `:hover` rule because touch devices
+  // never hover — that's why the cards wouldn't stop on a phone. Pointer
+  // events cover mouse, touch and pen from one code path.
+  const hold = useCallback(() => setPaused(true), [])
+  const release = useCallback(() => setPaused(false), [])
+
+  const track = {
+    animationDuration: `${fast ? FAST : CRUISE}s`,
+    animationPlayState: paused ? 'paused' : ('running' as const),
+  }
 
   return (
     <Section id="work" className="overflow-hidden">
@@ -63,20 +81,26 @@ export function Work() {
             ))}
           </div>
         ) : (
-          <div className="group relative flex overflow-hidden">
+          <div
+            className="relative flex overflow-hidden"
+            onMouseEnter={hold}
+            onMouseLeave={release}
+            onPointerDown={hold}
+            onPointerUp={release}
+            onPointerCancel={release}
+            onFocusCapture={hold}
+            onBlurCapture={release}
+          >
             {/* The list is rendered twice; the track travels exactly one copy's
                 width, so the loop point is invisible. Each card carries its gap
                 as margin-right, which keeps the two halves exactly equal — a
                 flex `gap` would leave a half-gap of drift at the seam. */}
-            <div className="flex animate-marquee group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]">
+            <div className="flex animate-marquee" style={track}>
               {PROJECTS.map((p) => (
                 <Card key={p.name} project={p} />
               ))}
             </div>
-            <div
-              className="flex animate-marquee group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]"
-              aria-hidden="true"
-            >
+            <div className="flex animate-marquee" style={track} aria-hidden="true">
               {PROJECTS.map((p) => (
                 <Card key={`${p.name}-dup`} project={p} />
               ))}
@@ -89,10 +113,34 @@ export function Work() {
         )}
       </Reveal>
 
-      <div className="mx-auto mt-8 w-full max-w-5xl">
+      <div className="mx-auto mt-8 flex w-full max-w-5xl items-center gap-4">
         <p className="font-mono text-[0.68rem] tracking-wider text-mute/70">
-          {reduced ? 'Scroll the row to browse' : 'Hover to pause'}
+          {reduced ? 'Scroll the row to browse' : 'Hover or hold to pause'}
         </p>
+
+        {!reduced && (
+          <button
+            type="button"
+            onClick={() => setFast((v) => !v)}
+            aria-pressed={fast}
+            aria-label={fast ? 'Slow the carousel down' : 'Speed the carousel up'}
+            title={fast ? 'Normal speed' : 'Speed up'}
+            className={`ml-auto flex h-9 items-center gap-2 rounded-full border px-4 font-mono text-[0.66rem] tracking-wider transition-colors duration-300 ${
+              fast
+                ? 'border-amber text-amber'
+                : 'border-hairline text-mute hover:border-amber hover:text-amber'
+            }`}
+          >
+            {fast ? 'Normal' : 'Faster'}
+            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+              {fast ? (
+                <path d="M6 5h3v14H6zM15 5h3v14h-3z" fill="currentColor" />
+              ) : (
+                <path d="M3 5l9 7-9 7V5zM13 5l9 7-9 7V5z" fill="currentColor" />
+              )}
+            </svg>
+          </button>
+        )}
       </div>
     </Section>
   )
